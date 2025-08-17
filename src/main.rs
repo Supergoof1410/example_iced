@@ -3,13 +3,12 @@ use iced::widget::{button, Button, column, Column, text, Text};
 
 #[derive(Default)]
 struct MyApp {
-    button_state: button::State,
     counter: i32,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
-    ButtonPressed,
+    ChangeCounter(i32),   // eine Message mit Parameter
 }
 
 impl Sandbox for MyApp {
@@ -19,28 +18,38 @@ impl Sandbox for MyApp {
         MyApp::default()
     }
 
+    fn theme(&self) -> iced::Theme {
+        iced::Theme::Dark
+    }
+
     fn title(&self) -> String {
-        String::from("Minimal Iced Beispiel 0.12")
+        String::from("Counter mit Parametern")
     }
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::ButtonPressed => self.counter += 1,
+            Message::ChangeCounter(delta) => self.counter += delta,
         }
     }
 
-    fn view(&self) -> iced::Element<Message> {
-        let btn = Button::new(Text::new("Klick mich!"))
-                .on_press(Message::ButtonPressed);
+    fn view(&self) -> iced::Element<'_, Message> {
+        // Button "Hoch" gibt +1 weiter
+        let btn_up: Button<'_, Message> = Button::new(Text::new("Hoch"))
+            .on_press(Message::ChangeCounter(1));
 
-        let content = Column::new()
+        // Button "Runter" gibt -1 weiter
+        let btn_down: Button<'_, Message> = Button::new(Text::new("Runter"))
+            .on_press(Message::ChangeCounter(-1));
+
+        // Alles zusammen in einer Spalte
+        Column::new()
             .push(text(format!("Counter: {}", self.counter)))
-            .push(btn);
-
-        content.into()
+            .push(btn_up)
+            .push(btn_down)
+            .into()
     }
 }
 
-fn main() -> iced::Result {
-    MyApp::run(Settings::default())
+fn main() {
+    MyApp::run(Settings::default());
 }
